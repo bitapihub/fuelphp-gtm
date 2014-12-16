@@ -105,11 +105,12 @@ When sending multiple product additions or removals, do not use the "quantity" p
 To track a variant of a product, you must give the product a different "id" or "name" value. A simple way to do this is to append text to the id, since GTM takes a string for the "id" field. You may do the same with the "name" field if you're using that as your item identifier. (Ex. You have a moustache kit with the ID of "1001" in your database, but you need to track a kit for a handlebar moustache. You can give it the ID "1001_handlebar" and your stats will stay accurate for that variation.
 
 **Parameters**
-| Variable | Type | Description |
-| -------- | ---- | ----------- |
-| $array_of_productFieldObjects | array | The array of product data for the item being added to the cart.|
-| $direction | string  | "add" or "remove" (Case sensitive) - Default: add |
-| $quantity  | integer | The number of items you're adding or removing from the cart. Default: 1 |
+
+| Variable        | Type           | Description  |
+| ------------- | ------------- | ----- |
+| $array_of_productFieldObjects | array       | The array of product data for the item being added to the cart. |
+| $direction                    | string      | "add" or "remove" (Case sensitive) - Default: add |
+| $quantity                     | integer     | The number of items you're adding or removing from the cart. Default: 1 |
 
 ``` $analytics->set_cart($array_of_productFieldObjects, 'add', 5); ```
 
