@@ -1,14 +1,17 @@
 GTM for FuelPHP
 ===============
 
-**NOTE: This project is currently a WIP and will be made available shortly. (Winin a few days.)**
-
 At Bit API Hub we employ both Google Tag Manager (GTM) and FuelPHP as part of our infrastructure, but we're far from the only company who takes that approach. In order to empower your GTM implementation to access critical information like what coupons customers use and what products they have in their cart, you must install code (dataLayer) to send that information to GTM.
 
 GTM for FuelPHP provides the following advantages for your company.
 * Your programmers have less code to write. They have one-line access to each type of dataLayer code.
 * Your web designers need only use a class and ID on each link they wish to track.
 * Use a config file for any repetitive events and variables.
+
+Version
+-------
+
+The current version of this software is: Version 0.5 Beta.
 
 Prerequisites
 -------------
