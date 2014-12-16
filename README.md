@@ -112,7 +112,7 @@ To track a variant of a product, you must give the product a different "id" or "
 | $direction                    | string      | "add" or "remove" (Case sensitive) - Default: add |
 | $quantity                     | integer     | The number of items you're adding or removing from the cart. Default: 1 |
 
-``` $analytics->set_cart($array_of_productFieldObjects, 'add', 5); ```
+``` $analytics->set_cart($array_of_productFieldObjects, $direction, $quantity); ```
 
 **Checkout Steps**
 
