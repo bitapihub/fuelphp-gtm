@@ -23,9 +23,10 @@ Installation and Configuration
 ------------------------------
 
 1. Download the sources to your fuel/packages directory.
-2. Copy the analytics.php config file to your APPPATH/config directory and configure it to your liking. You must change the GTM ID to match that of your GTM container. For security reasons, consider placing a configuration file with that ID in only the appropriate environment subfolder.
-3. Move the REDIST/fuelphp-gtm.js file to assets/js/fuelphp-gtm.js and include it for output. You may also minify it and/or place it within another js file on your site to lower your page load processing time and bandwidth.
-4. Place the code below just after the <body> tag. (This code uses Smarty variables. If you do not use Smarty for your template engine, modify the variables. See the list of variables below the code.)
+2. Open your config.php file and add the package 'gtm' to the 'always_load' 'packages' section of the configuration. If you'd prefer load it manually, use \Package::load('gtm');. The latter is not supported.
+3. Copy the analytics.php config file to your APPPATH/config directory and configure it to your liking. You must change the GTM ID to match that of your GTM container. For security reasons, consider placing a configuration file with that ID in only the appropriate environment subfolder.
+4. Move the REDIST/fuelphp-gtm.js file to assets/js/fuelphp-gtm.js and include it for output. You may also minify it and/or place it within another js file on your site to lower your page load processing time and bandwidth.
+5. Place the code below just after the <body> tag. (This code uses Smarty variables. If you do not use Smarty for your template engine, modify the variables. See the list of variables below the code.)
 
 ```
 <!-- Start Google Tag Manager -->
@@ -41,18 +42,18 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 Variables: ``` {$GTM_ID}, {$GTM_variables_no_js}, {$GTM_variables}, {$GTM_dataLayer} ```
 
-5. You need to process the template variables stated above. To do so, run the set_safe() method from the \View or \Theme class while processing the template containing the above code. You may use the set() method of GTM_ID's variable, but due to the nature of the other variables, you must allow the unaltered code to show. Therefore, be sure to properly screen any user input that you pass to these variables.
+6. You need to process the template variables stated above. To do so, run the set_safe() method from the \View or \Theme class while processing the template containing the above code. You may use the set() method of GTM_ID's variable, but due to the nature of the other variables, you must allow the unaltered code to show. Therefore, be sure to properly screen any user input that you pass to these variables.
 
 ```
 $analytics = \GTM\Analytics::instance();
 
 [DESIRED INSTANCE]->set_safe('GTM_variables', $analytics->render(true))
 ->set_safe('GTM_variables_no_js', $analytics->render(true, true))
-->set('GTM_ID', $analytics->config['ID'])
+->set('GTM_ID', \Config::get('gtm.ID'))
 ->set_safe('GTM_dataLayer', $analytics->render());
 ```
 
-6. Configure your tags as specified in the [Ecommerce Developers Guide](https://developers.google.com/tag-manager/enhanced-ecommerce). Click the 'See the Tag Configuration for this Example'
+7. Configure your tags as specified in the [Ecommerce Developers Guide](https://developers.google.com/tag-manager/enhanced-ecommerce). Click the 'See the Tag Configuration for this Example'
 to figure out how to properly configure each tag. As it was written for the outdated version of GTM which ends/ended January 1st, 2015, take the following into consideration.
 
 * Rules are now called triggers
@@ -83,7 +84,7 @@ See Google's [guide on product clicks](https://developers.google.com/tag-manager
 
 1. Configure the "product_click" key of the configuration file's "defaults" key to contain the desired productFieldObjects for every possible product. If you're running a retail outlet or for some other reason you cannot possibly add a full list of products in this location, you may set the $config property of the \GTM\Analytics class to change this value in realtime.
 
-``` $analytics->config['defaults']['product_click'] = array() ```
+``` \Config::set('gtm.defaults.product_click', array()); ```
 
 2. Change your product links to include the class 'product-click' and set its ID attribute to the key name specified in the 'product_click' array. Leave the link (href) alone and the JS will take care of the rest. Your 'href' attribute is your callback URL.
 
@@ -93,19 +94,70 @@ See Google's [guide on product detail impressions](https://developers.google.com
 
 ``` $analytics->set_product_view($array_of_productFieldObjects); ```
 
-**Add an Item to the Cart**
+**Add/Remove an Item to/from the Cart**
 
 See Google's [guide on shopping cart operations](https://developers.google.com/tag-manager/enhanced-ecommerce#cart).
 
-``` $analytics->set_cart($array_of_productFieldObjects); ```
+The script also tracks the contents of your cart using this function so that you don't need to specify the product list for the checkout operations, including measuring purchases. To help keep things synchronized, the $cart_contents property of \GTM\Analytics is public and it contains the full cart contents. GTM for FuelPHP uses \Session for tracking your cart through your site. (GTM_cart_contents key) The session key holds the same data as the $cart_contents property.
 
-**Remove an Item from the Cart**
+When sending multiple product additions or removals, do not use the "quantity" parameter for GTM's product list. (Ex. In $array_of_productFieldObjects) Instead, pass the quantity through the $quantity parameter on this function so that it can track how many items are being added or removed. In doing this, the product list will have all the proper quantities for each item in the list sent to GTM.
 
-See Google's [guide on shopping cart operations](https://developers.google.com/tag-manager/enhanced-ecommerce#cart).
+To track a variant of a product, you must give the product a different "id" or "name" value. A simple way to do this is to append text to the id, since GTM takes a string for the "id" field. You may do the same with the "name" field if you're using that as your item identifier. (Ex. You have a moustache kit with the ID of "1001" in your database, but you need to track a kit for a handlebar moustache. You can give it the ID "1001_handlebar" and your stats will stay accurate for that variation.
 
-NOTE: The 'remove' parameter is case-sensitive.
+**Parameters**
+| Variable | Type | Description |
+| -------- | ---- | ----------- |
+| $array_of_productFieldObjects | array | The array of product data for the item being added to the cart.|
+| $direction | string  | "add" or "remove" (Case sensitive) - Default: add |
+| $quantity  | integer | The number of items you're adding or removing from the cart. Default: 1 |
 
-``` $analytics->set_cart($array_of_productFieldObjects, 'remove'); ```
+``` $analytics->set_cart($array_of_productFieldObjects, 'add', 5); ```
+
+**Checkout Steps**
+
+See Google's [guide on measuring a checkout](https://developers.google.com/tag-manager/enhanced-ecommerce#checkout).
+
+The checkout process relies on what items are in a customer's shopping cart. (You must use the set_cart() method to set what's in the cart.) If you're selling one product per customer, such as a company marketing different package levels for a service, you don't actually need a shopping cart for customers to collect their items. Therefore, in order to track what your customers are buying from you, let the customer click the "buy now" button, then have your system process the set_cart() method in it's usual workflow, followed by the set_checkout_step() method. That will allow you to send the proper events to GTM without an unnecessary step on your interface.
+
+There are two ways to set your one and only "option" field that you can pass with this function. (See set_checkout_options() to set further options.) First, you can set the option via PHP, by passing the second parameter below as the value for the option field. (The first parameter is the step number.)
+
+``` $analytics->set_checkout_step(1, 'my option'); ```
+
+The second option you have to set that option is to use JS to set it using an "onclick" event or the like. The JS version will override the option set by PHP.
+
+``` <a href="#" onclick="GTM_checkout['option']='my option';">Change the Option</a> ```
+
+**Extra Checkout Options**
+
+See Google's [guide on measuring a checkout](https://developers.google.com/tag-manager/enhanced-ecommerce#checkout).
+
+When you need to send more than one option, you can do so through PHP or though JS. If you only have one option, you may set $options to a string. If you have multiple options to set, create an array of options. (Ex. array("option 1", "option 2");) This method will use the same step number as set_checkout_step() above.
+
+``` $analytics->set_checkout_options($options); ```
+
+To let your users set checkout options as they click on stuff, use the class "checkout-option" with data-gtm-option set to the option value. Please note that the JS version for the main checkout event will only set the option as the user clicks around. The JS version below will send to GTM every option the user clicks on. Plan accordingly.
+
+``` <a href="#" class="checkout-option" data-gtm-option="my option">Send "my option" to GTM</a> ```
+
+**Transactions**
+
+See Google's [guide on measuring purchases](https://developers.google.com/tag-manager/enhanced-ecommerce#purchases).
+
+$array_of_actionFieldObjects must contain at least the transaction id. The list of products is set from the add/remove items method, set_cart().
+
+NOTE: Once you've rendered the JS scripts using the render() method, the cart contents are destroyed.
+
+``` $analytics->set_checkout_options($array_of_actionFieldObjects); ```
+
+**Refunds**
+
+See Google's [guide on measuring refunds](https://developers.google.com/tag-manager/enhanced-ecommerce#refunds).
+
+There are two types of refunds, partial refunds, and full refunds. When you process a full refund, you must only send the $transaction_id for the transaction you're refunding. If you need to issue a partial refund, load each product into the transaction you're refunding by passing $array_of_productFieldObjects in the call for each product. (You'll write the line of code for each product you're refunding.)
+
+Unfortunately you may only process one refund per page load. If you're trying to do bulk refund processing, for example when finalizing your daily transactions at the end of the day, you're going to find it difficult. This issue is a limitation imposed by Google's system. Refunds are not event based and therefore they must be sent immediately to GTM with the gtm.js event. Therefore, if you add multiple refunds, you'll end up overwriting your refund code before GTM even processes the first refund code.
+
+``` $analytics->set_refund($transaction_id, $array_of_productFieldObjects); ```
 
 **Promotion Impressions**
 
@@ -119,7 +171,12 @@ See Google's [guide on promotion clicks](https://developers.google.com/tag-manag
 
 1. Configure the "promo_click" key of the configuration file's "defaults" key to contain the desired promoFieldObjects for every possible promo. If for some other reason you cannot possibly add a full list of promos in this location, you may set the $config property of the \GTM\Analytics class to change this value in realtime.
 
-``` $analytics->config['defaults']['promo_click'] = array(); ```
+``` \Config::set('gtm.defaults.promo_click', array()); ```
+
+Always Required
+---------------
+
+After you've set your script to track everything, you must place the generated code in the appropriate location with the render() method. The script is thrice rendered. See the configuration section above for a description of how to use the render() method.
 
 Add Custom Data
 ----------------
@@ -149,6 +206,11 @@ When you need to write your own events, that's easy. Try this out. It's set at t
 ``` $analytics->set_event(array('event' => 'my_event', 'ecommerce' => array('my_key' => 'my_value'))); ```
 
 The only required part is to have a key named 'event' set to the name of your event. If you have events you'd like called on every page, use the config file's 'event' key.
+
+Troubleshooting
+---------------
+
+When your settings aren't taking effect or files can't be found, clear your FuelPHP cache. (APPPATH/cache)
 
 Credits
 -------
