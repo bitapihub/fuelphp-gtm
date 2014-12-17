@@ -45,7 +45,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
 Variables: ``` {$GTM_ID}, {$GTM_variables_no_js}, {$GTM_variables}, {$GTM_dataLayer} ```
 
-6. You need to process the template variables stated above. To do so, run the set_safe() method from the \View or \Theme class while processing the template containing the above code. You may use the set() method of GTM_ID's variable, but due to the nature of the other variables, you must allow the unaltered code to show. Therefore, be sure to properly screen any user input that you pass to these variables.
+* You need to process the template variables stated above. To do so, run the set_safe() method from the \View or \Theme class while processing the template containing the above code. You may use the set() method of GTM_ID's variable, but due to the nature of the other variables, you must allow the unaltered code to show. Therefore, be sure to properly screen any user input that you pass to these variables.
 
 ```
 $analytics = \GTM\Analytics::instance();
@@ -56,8 +56,10 @@ $analytics = \GTM\Analytics::instance();
 ->set_safe('GTM_dataLayer', $analytics->render());
 ```
 
-7. Configure your tags as specified in the [Ecommerce Developers Guide](https://developers.google.com/tag-manager/enhanced-ecommerce). Click the 'See the Tag Configuration for this Example'
+* Configure your tags as specified in the [Ecommerce Developers Guide](https://developers.google.com/tag-manager/enhanced-ecommerce). Click the 'See the Tag Configuration for this Example'
 to figure out how to properly configure each tag. As it was written for the outdated version of GTM which ends/ended January 1st, 2015, take the following into consideration.
+
+**Changes to GTM**
 
 * Rules are now called triggers
 
@@ -85,11 +87,11 @@ See Google's [guide on product impressions](https://developers.google.com/tag-ma
 
 See Google's [guide on product clicks](https://developers.google.com/tag-manager/enhanced-ecommerce#product-clicks).
 
-1. Configure the "product_click" key of the configuration file's "defaults" key to contain the desired productFieldObjects for every possible product. If you're running a retail outlet or for some other reason you cannot possibly add a full list of products in this location, you may set the $config property of the \GTM\Analytics class to change this value in realtime.
+* Configure the "product_click" key of the configuration file's "defaults" key to contain the desired productFieldObjects for every possible product. If you're running a retail outlet or for some other reason you cannot possibly add a full list of products in this location, you may set the $config property of the \GTM\Analytics class to change this value in realtime.
 
 ``` \Config::set('gtm.defaults.product_click', array()); ```
 
-2. Change your product links to include the class 'product-click' and set its ID attribute to the key name specified in the 'product_click' array. Leave the link (href) alone and the JS will take care of the rest. Your 'href' attribute is your callback URL.
+* Change your product links to include the class 'product-click' and set its ID attribute to the key name specified in the 'product_click' array. Leave the link (href) alone and the JS will take care of the rest. Your 'href' attribute is your callback URL.
 
 **Product Detail Impressions (Ex. Someone sees the details of your product instead of a summary.)**
 
@@ -173,7 +175,7 @@ See Google's [guide on promotion impressions](https://developers.google.com/tag-
 
 See Google's [guide on promotion clicks](https://developers.google.com/tag-manager/enhanced-ecommerce#promo-clicks).
 
-1. Configure the "promo_click" key of the configuration file's "defaults" key to contain the desired promoFieldObjects for every possible promo. If for some other reason you cannot possibly add a full list of promos in this location, you may set the $config property of the \GTM\Analytics class to change this value in realtime.
+Configure the "promo_click" key of the configuration file's "defaults" key to contain the desired promoFieldObjects for every possible promo. If for some other reason you cannot possibly add a full list of promos in this location, you may set the $config property of the \GTM\Analytics class to change this value in realtime.
 
 ``` \Config::set('gtm.defaults.promo_click', array()); ```
 
