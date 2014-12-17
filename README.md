@@ -25,7 +25,7 @@ Prerequisites
 Installation and Configuration
 ------------------------------
 
-1. Download the sources to your fuel/packages directory.
+1. Download the sources to your fuel/packages directory. (fuel/packages/gtm)
 2. Open your config.php file and add the package 'gtm' to the 'always_load' 'packages' section of the configuration. If you'd prefer load it manually, use \Package::load('gtm');. The latter is not supported.
 3. Copy the analytics.php config file to your APPPATH/config directory and configure it to your liking. You must change the GTM ID to match that of your GTM container. For security reasons, consider placing a configuration file with that ID in only the appropriate environment subfolder.
 4. Move the REDIST/fuelphp-gtm.js file to assets/js/fuelphp-gtm.js and include it for output. You may also minify it and/or place it within another js file on your site to lower your page load processing time and bandwidth.
