@@ -87,11 +87,11 @@ See Google's [guide on product impressions](https://developers.google.com/tag-ma
 
 See Google's [guide on product clicks](https://developers.google.com/tag-manager/enhanced-ecommerce#product-clicks).
 
-* Configure the "product_click" key of the configuration file's "defaults" key to contain the desired productFieldObjects for every possible product. If you're running a retail outlet or for some other reason you cannot possibly add a full list of products in this location, you may set the $config property of the \GTM\Analytics class to change this value in realtime.
+Configure the "product_click" key of the configuration file's "defaults" key to contain the desired productFieldObjects for every possible product. If you're running a retail outlet or for some other reason you cannot possibly add a full list of products in this location, you may set the $config property of the \GTM\Analytics class to change this value in realtime.
 
 ``` \Config::set('gtm.defaults.product_click', array()); ```
 
-* Change your product links to include the class 'product-click' and set its ID attribute to the key name specified in the 'product_click' array. Leave the link (href) alone and the JS will take care of the rest. Your 'href' attribute is your callback URL.
+Change your product links to include the class 'product-click' and set its ID attribute to the key name specified in the 'product_click' array. Leave the link (href) alone and the JS will take care of the rest. Your 'href' attribute is your callback URL.
 
 **Product Detail Impressions (Ex. Someone sees the details of your product instead of a summary.)**
 
