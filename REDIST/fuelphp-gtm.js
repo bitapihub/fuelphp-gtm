@@ -71,4 +71,55 @@ $(function(){
 		}
 	});
 	
+	/* GTM checkout clicks */
+	$('.checkout-step').click(function(event) {
+		event.preventDefault();
+		
+		if (GTM_checkout) {
+			
+			url = $(this).attr('href');
+			
+			dataLayer.push({
+				'event': 'checkout',
+				'ecommerce': {
+					'checkout': {
+						'actionField': {'step': GTM_checkout.step, 'option': GTM_checkout.option},
+						'products': GTM_checkout.products
+					}
+				},
+				'eventCallback': function() {
+					document.location = url
+				}
+			});
+			
+		} else {
+			if (window.console) {
+				console.log('GTM: The GTM_checkout variable doesn\'t exist. Click tracking has been disabled for this link.');
+			}
+			document.location = $(this).attr('href');
+		}
+	});
+	
+	/* GTM checkout option clicks */
+	$('.checkout-option').click(function(event) {
+		event.preventDefault();
+
+		if (GTM_checkout) {
+
+			dataLayer.push({
+				'event': 'checkoutOption',
+				'ecommerce': {
+					'checkout_option': {
+						'actionField': {'step': GTM_checkout.step, 'option': $(this).attr('data-gtm-option')}
+					}
+				}
+			});
+			
+		} else {
+			if (window.console) {
+				console.log('GTM: The GTM_checkout variable doesn\'t exist. Click tracking has been disabled for this link.');
+			}
+		}
+	});
+	
 });
