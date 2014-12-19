@@ -83,7 +83,7 @@ $(function(){
 				'event': 'checkout',
 				'ecommerce': {
 					'checkout': {
-						'actionField': {'step': GTM_checkout.step, 'option': GTM_checkout.option},
+						'actionField': {'step': GTM_checkout.step, 'option': GTM_checkout.option, 'list': GTM_checkout.list},
 						'products': GTM_checkout.products
 					}
 				},
