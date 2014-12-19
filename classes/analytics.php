@@ -189,9 +189,6 @@ class Analytics
 			 
 		}
 		
-		// The page on the site where the impression was set
-		$impression['list'] = $this->_list;
-		
 		// Add the impression and merge any data from the config that's common to all of them.
 		$impression = array_merge(
 			
@@ -199,6 +196,9 @@ class Analytics
 			$product
 			
 		);
+		
+		// The page on the site where the impression was set
+		$impression['list'] = $this->_list;
 		
 		$this->_impressions['ecommerce']['impressions'][] = $impression;
 	}
@@ -408,7 +408,8 @@ class Analytics
 						'actionField'	=> array(
 			
 							'step'		=> $this->_step,
-							'option'	=> $option_value
+							'option'	=> $option_value,
+							'list'		=> $this->_list
 			
 						)
 			
@@ -437,7 +438,8 @@ class Analytics
 			
 		}
 		
-		$products_list = $this->_format_products_list();
+		$products_list			= $this->_format_products_list();
+		$transaction['list']	= $this->_list;
 				
 		$this->_transaction = array(
 	
@@ -466,6 +468,8 @@ class Analytics
 	 */
 	public function set_refund($transaction_id, array $products = array())
 	{
+		$transaction_id['list'] = $this->_list;
+		
 		/////////////////////////
 		// Full refunds
 		if (empty($products)) {
@@ -745,6 +749,7 @@ class Analytics
 				
 				'step'		=> $this->_step,
 				'option'	=> $this->_step_option,
+				'list'		=> $this->_list,
 				'products'	=> $cart_products
 				
 			);
