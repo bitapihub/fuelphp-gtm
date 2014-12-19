@@ -51,9 +51,9 @@ Variables: ``` {$GTM_ID}, {$GTM_variables_no_js}, {$GTM_variables}, {$GTM_dataLa
 $analytics = \GTM\Analytics::instance();
 
 [DESIRED INSTANCE]->set_safe('GTM_variables', $analytics->render(true))
+->set_safe('GTM_dataLayer', $analytics->render())
 ->set_safe('GTM_variables_no_js', $analytics->render(true, true))
-->set('GTM_ID', \Config::get('gtm.ID'))
-->set_safe('GTM_dataLayer', $analytics->render());
+->set('GTM_ID', \Config::get('gtm.ID'));
 ```
 
 * Configure your tags as specified in the [Ecommerce Developers Guide](https://developers.google.com/tag-manager/enhanced-ecommerce). Click the 'See the Tag Configuration for this Example'
