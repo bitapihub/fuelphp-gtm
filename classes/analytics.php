@@ -601,98 +601,16 @@ class Analytics
 	/**
 	 * Generate all of the GTM dataLayer code from what the script has gathered.
 	 * 
-	 * @param bool $page_variables	Set to true to render the page variables for GTM to rely on
-	 * @param bool $no_js			Set to true to render the non-js version of $page_variables
-	 * @link https://developers.google.com/analytics/devguides/collection/analyticsjs/enhanced-ecommerce#impression-data
+	 * @link https://developers.google.com/tag-manager/enhanced-ecommerce
 	 * 
 	 * @return string The entire dataLayer contents rendered as inline JS through @see \Asset::js()
 	 */
-	public function render($page_variables = false, $no_js = false)
+	public function render()
 	{
-		// Set the stuff from the config.
-		$this->set_variables();
-		$this->set_non_event();
-		$this->set_event();
-		
 		$session = \Session::instance();
 		
-		///////////////////////////////////////////////////////
-		// Generate the page variables and non-event code when requested.
-		if ($page_variables === true) {
-			
-			// Just the variables for the no JS version
-			if ($no_js === true) {
-				
-				return empty($this->_variables) ? null : '&'.\Uri::build_query_string($this->_variables);
-				
-			}
-			
-			///////////////////////////////////////////////////////
-			// Page variables and events
-			$non_events = empty($this->_variables) ? array() : $this->_variables;
-			
-			if (!empty($this->_non_events)) {
-				
-				$non_events = array_replace_recursive($non_events, $this->_non_events);
-				
-			}
-			
-			///////////////////////////////////////////////////////
-			// If we have impressions, generate that code.
-			if (!empty($this->_impressions)) {
-				
-				$non_events = array_replace_recursive($non_events, $this->_impressions);
-				
-			}
-			
-			///////////////////////////////////////////////////////
-			// If we have product details views, generate that code.
-			if (!empty($this->_product_view)) {
-				
-				$non_events = array_replace_recursive($non_events, $this->_product_view);
-				
-			}
-			
-			///////////////////////////////////////////////////////
-			// If we have promo views to process, generate that code.
-			if (!empty($this->_promo_view)) {
-	
-				$non_events = array_replace_recursive($non_events, $this->_promo_view);
-				
-			}
-			
-			///////////////////////////////////////////////////////
-			// If we have a transaction to process, generate that code.
-			if (!empty($this->_transaction)) {
-					
-				$non_events = array_replace_recursive($non_events, $this->_transaction);
-				
-				// Remove the cart contents as we've just completed the purchase.
-				$this->cart_contents = array();
-				$session->set('GTM_cart_contents', array());
-					
-			}
-			
-			///////////////////////////////////////////////////////
-			// If we have a refund to process, generate that code.
-			
-			// Partial Refund
-			if (!empty($this->_refunded_products)) {
-					
-				$non_events = array_replace_recursive($non_events, $this->_refunded_products);
-			
-			// Full Refund
-			} elseif (!empty($this->_refund)) {
-					
-				$non_events = array_replace_recursive($non_events, $this->_refund);
-				
-			}
-			
-			return empty($non_events) ? null : 'dataLayer = ['.json_encode($non_events).'];';
-			
-		}
-		
 		// No events by default, but if we have custom events, we set those now.
+		$this->set_event();
 		$events = $this->_events;
 		
 		///////////////////////
@@ -774,6 +692,94 @@ class Analytics
 		}
 		
 		return empty($events) ? null : '<script type="text/javascript">'.$events.'</script>';
+	}
+	
+	/**
+	 * Generate all of the GTM dataLayer code from what the script has gathered.
+	 *
+	 * @param bool $no_js Set to true to render the non-js version of $page_variables
+	 * @link https://developers.google.com/tag-manager/enhanced-ecommerce
+	 *
+	 * @return string The entire dataLayer contents rendered as inline JS through @see \Asset::js() or a query string
+	 * 					if $no_js is set to true.
+	 */
+	public function render_gtm_event($no_js = false)
+	{
+		///////////////////////////////////////////////////////
+		// Generate the page variables and non-event code when requested.
+		$this->set_variables();
+		$this->set_non_event();
+		$session = \Session::instance();
+			
+		// Just the variables for the no JS version
+		if ($no_js === true) {
+		
+			return empty($this->_variables) ? null : '&'.\Uri::build_query_string($this->_variables);
+		
+		}
+			
+		///////////////////////////////////////////////////////
+		// Page variables and events
+		$non_events = empty($this->_variables) ? array() : $this->_variables;
+			
+		if (!empty($this->_non_events)) {
+		
+			$non_events = array_replace_recursive($non_events, $this->_non_events);
+		
+		}
+			
+		///////////////////////////////////////////////////////
+		// If we have impressions, generate that code.
+		if (!empty($this->_impressions)) {
+		
+			$non_events = array_replace_recursive($non_events, $this->_impressions);
+		
+		}
+			
+		///////////////////////////////////////////////////////
+		// If we have product details views, generate that code.
+		if (!empty($this->_product_view)) {
+		
+			$non_events = array_replace_recursive($non_events, $this->_product_view);
+		
+		}
+			
+		///////////////////////////////////////////////////////
+		// If we have promo views to process, generate that code.
+		if (!empty($this->_promo_view)) {
+		
+			$non_events = array_replace_recursive($non_events, $this->_promo_view);
+		
+		}
+			
+		///////////////////////////////////////////////////////
+		// If we have a transaction to process, generate that code.
+		if (!empty($this->_transaction)) {
+				
+			$non_events = array_replace_recursive($non_events, $this->_transaction);
+		
+			// Remove the cart contents as we've just completed the purchase.
+			$this->cart_contents = array();
+			$session->set('GTM_cart_contents', array());
+			
+		}
+			
+		///////////////////////////////////////////////////////
+		// If we have a refund to process, generate that code.
+			
+		// Partial Refund
+		if (!empty($this->_refunded_products)) {
+				
+			$non_events = array_replace_recursive($non_events, $this->_refunded_products);
+				
+			// Full Refund
+		} elseif (!empty($this->_refund)) {
+				
+			$non_events = array_replace_recursive($non_events, $this->_refund);
+		
+		}
+			
+		return empty($non_events) ? null : 'dataLayer = ['.json_encode($non_events).'];';
 	}
 	
 	/**

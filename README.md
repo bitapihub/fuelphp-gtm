@@ -1,7 +1,7 @@
 GTM for FuelPHP
 ===============
 
-At Bit API Hub we employ both Google Tag Manager (GTM) and FuelPHP as part of our infrastructure, but we're far from the only company who takes that approach. In order to empower your GTM implementation to access critical information like what coupons customers use and what products they have in their cart, you must install code (dataLayer) to send that information to GTM.
+In order to empower your GTM implementation to access critical information like what coupons customers use and what products they have in their cart, you must install code (dataLayer) to send that information to GTM.
 
 GTM for FuelPHP provides the following advantages for your company.
 * Your programmers have less code to write. They have one-line access to each type of dataLayer code.
@@ -11,7 +11,13 @@ GTM for FuelPHP provides the following advantages for your company.
 Version
 -------
 
-The current version of this software is: Version 0.5 Beta.
+The current version of this software is: Version 0.6 Beta.
+
+Change Log
+----------
+
+**Version 0.6 Beta**
+* Separated the render method as it was becoming unwieldy
 
 Prerequisites
 -------------
@@ -50,9 +56,9 @@ Variables: ``` {$GTM_ID}, {$GTM_variables_no_js}, {$GTM_variables}, {$GTM_dataLa
 ```
 $analytics = \GTM\Analytics::instance();
 
-[DESIRED INSTANCE]->set_safe('GTM_variables', $analytics->render(true))
-->set_safe('GTM_dataLayer', $analytics->render())
-->set_safe('GTM_variables_no_js', $analytics->render(true, true))
+[DESIRED INSTANCE]->set_safe('GTM_dataLayer', $analytics->render())
+->set_safe('GTM_variables', $analytics->render_gtm_event())
+->set_safe('GTM_variables_no_js', $analytics->render_gtm_event(true))
 ->set('GTM_ID', \Config::get('gtm.ID'));
 ```
 
@@ -93,7 +99,7 @@ Configure the "product_click" key of the configuration file's "defaults" key to 
 
 Change your product links to include the class 'product-click' and set its ID attribute to the key name specified in the 'product_click' array. Leave the link (href) alone and the JS will take care of the rest. Your 'href' attribute is your callback URL.
 
-**Product Detail Impressions (Ex. Someone sees the details of your product instead of a summary.)**
+**Product Detail Impressions** (Ex. Someone sees the details of your product instead of a summary.)
 
 See Google's [guide on product detail impressions](https://developers.google.com/tag-manager/enhanced-ecommerce#details).
 
@@ -197,6 +203,8 @@ You may wish to set variables at the top of the page to aid in your GTM marketin
 
 Now JimBob is set to an integer value of 1. In GTM, you can now track to see if that variable is set and fire a tag based on JimBob. Isn't JimBob awesome? :) If you only set variables in your config file, you don't need to add any extra code. Do not set events or arrays here! The page variables are also set in the noscript version. See the next section for that.
 
+You also use GTM variables when setting up custom dimensions and metrics for things like cohort analysis. Check out the [thread on the product forums for how to set up UA variables in GTM version 2.](https://productforums.google.com/d/msg/tag-manager/W6XrhherGSA/oX9LLC-CRGAJ)
+
 **GTM events to fire with gtm.js**
 
 GTM only does stuff when an event is fired. Certain code must be added to the dataLayer before the event gtm.js fires. (GTM fires gtm.js automatically.) As soon as gtm.js fires, everything on the dataLayer is sent to GTM for analysis. Impression data and product detail views are some items that can be added before gtm.js fires. You may need to add other "non-events" to GTM at some point and that's where this code comes in. Set the 'non_events' key in the config file to any "non-events" you wish to add by default or use the following code to add them dynamically.
@@ -218,7 +226,15 @@ Troubleshooting
 
 When your settings aren't taking effect or files can't be found, clear your FuelPHP cache. (APPPATH/cache)
 
+Known Issues
+------------
+
+The "Revenue," "Transactions," and "Transactions per Internal Promotion Click" do not change on the Ecommerce->Marketing->Internal Promotion section of UA. See the
+[https://productforums.google.com/d/msg/tag-manager/Ck_sRqXnJMQ/2atTl0LjzSEJ](thread on the Google Product Forums) about this issue.
+
 Credits
 -------
 
 This package contains [code licensed by Google](https://developers.google.com/tag-manager/enhanced-ecommerce) under the Apache 2.0 License. It also makes reference to code contained within FuelPHP 1.7.2, which is [licensed under the MIT license](http://fuelphp.com/docs/license.html).
+
+All other code, unless specified within the source code, is original code developed by Bit API Hub, and released under the Apache 2.0 license. See the [LICENSE](LICENSE) file for a copy of the Apache 2.0 license.
